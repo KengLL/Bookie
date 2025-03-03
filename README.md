@@ -1,2 +1,3 @@
 # Bookie
-Bookie lets users catalog their book collection, rank books, write reviews, and share them on social media. Users can explore each other’s libraries and exchange books.
+
+Bookie is a web application that transforms your favorite book details into a stylish, sports-bet receipt format. Connect your book data, search for titles, and generate your own "receipt" that includes genre, book name, publish year, author, and cover art.
