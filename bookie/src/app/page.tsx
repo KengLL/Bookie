@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useDebounce } from 'use-debounce';
-import { DndContext, DragOverlay, closestCenter } from '@dnd-kit/core';
+import { DndContext, closestCenter } from '@dnd-kit/core';
 import { arrayMove, SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import BookieReceipt from './bookieReceipt';
 
 // Types
 interface Book {
@@ -16,7 +17,6 @@ interface Book {
   isbn?: string;
   coverUrl?: string;
 }
-
 
 // Sortable Item Component
 const SortableItem = ({ book, onRemove }: { book: Book; onRemove: (id: string) => void }) => {
@@ -63,13 +63,15 @@ export default function Home() {
   const [isSearching, setIsSearching] = useState(false);
   const [noResults, setNoResults] = useState(false);
   const [books, setBooks] = useState<Book[]>([]);
+  const [userName, setUserName] = useState("Bookworm");
+  const [showOldReceipt, setShowOldReceipt] = useState(false);
 
   const isValidISBN = (query: string) => {
     const cleaned = query.replace(/-/g, '');
     return cleaned.length === 10 || cleaned.length === 13;
   };
 
-  // Search and API logic (similar to previous but returns Book type)
+  // Search and API logic
   const searchBooks = async (query: string) => {
     if (!query) return;
 
@@ -148,38 +150,67 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-8 flex justify-between gap-8 text-black">
-      {/* Betslip Receipt */}
-      <div className="w-1/2 bg-[#faf6eb] p-6 shadow-lg rounded-lg border-2 border-dashed border-gray-300 
-        bg-gradient-to-br from-[#fffdf6] via-[#fcf9f0] to-[#faf6eb]">
-        <div className="text-center mb-6">
-          <h1 className="text-3xl font-black text-gray-800">BOOKIE</h1>
-          <p className="text-sm text-gray-600">Literary Wager Receipt</p>
-        </div>
+      {/* Receipt Section */}
+      <div className="w-1/2">
+        {showOldReceipt ? (
+          <div className="w-full bg-[#faf6eb] p-6 shadow-lg rounded-lg border-2 border-dashed border-gray-300 
+            bg-gradient-to-br from-[#fffdf6] via-[#fcf9f0] to-[#faf6eb]">
+            <div className="text-center mb-6">
+              <h1 className="text-3xl font-black text-gray-800">BOOKIE</h1>
+              <p className="text-sm text-gray-600">Literary Wager Receipt</p>
+            </div>
 
-        <div className="space-y-4">
-          {books.map((book) => (
-            <div key={book.id} className="border-b border-gray-200 pb-2">
-              <div className="font-bold text-red-600 uppercase text-sm">{book.genre}</div>
-              <div className="flex justify-between items-baseline">
-                <div>
-                  <span className="text-lg font-semibold">{book.title}</span>
-                  <span className="text-sm text-gray-600 ml-2">- {book.author}</span>
+            <div className="space-y-4">
+              {books.map((book) => (
+                <div key={book.id} className="border-b border-gray-200 pb-2">
+                  <div className="font-bold text-red-600 uppercase text-sm">{book.genre}</div>
+                  <div className="flex justify-between items-baseline">
+                    <div>
+                      <span className="text-lg font-semibold">{book.title}</span>
+                      <span className="text-sm text-gray-600 ml-2">- {book.author}</span>
+                    </div>
+                  </div>
                 </div>
+              ))}
+            </div>
+
+            <div className="mt-6 pt-4 border-t border-gray-300">
+              <div className="flex justify-between font-bold">
+                <span>TOTAL SELECTIONS:</span>
+                <span>{books.length}</span>
               </div>
             </div>
-          ))}
-        </div>
-
-        <div className="mt-6 pt-4 border-t border-gray-300">
-          <div className="flex justify-between font-bold">
-            <span>TOTAL SELECTIONS:</span>
-            <span>{books.length}</span>
           </div>
+        ) : (
+          <BookieReceipt books={books} userName={userName} />
+        )}
+        
+        <div className="mt-4 flex justify-center">
+          <button 
+            onClick={() => setShowOldReceipt(!showOldReceipt)} 
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+          >
+            Switch to {showOldReceipt ? 'New' : 'Old'} Receipt Style
+          </button>
         </div>
       </div>
 
       {/* Search and Track List */}
       <div className="w-1/3 flex flex-col gap-6 text-black">
+        <div className="bg-white p-6 shadow-lg rounded-lg">
+          <h2 className="text-lg font-bold mb-4">User Settings</h2>
+          <div className="mb-4">
+            <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
+            <input
+              type="text"
+              id="username"
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
+              className="w-full p-2 border rounded bg-gray-50 focus:ring-2 focus:ring-blue-400"
+            />
+          </div>
+        </div>
+        
         <div className="bg-white p-6 shadow-lg rounded-lg">
           <h2 className="text-lg font-bold mb-4">Search Books</h2>
           <div className="relative">
@@ -191,7 +222,7 @@ export default function Home() {
               className="w-full p-2 border rounded bg-gray-50 focus:ring-2 focus:ring-blue-400"
             />
             
-            {isSearching && <div className="absolute top-12 p-2 text-sm"></div>}
+            {isSearching && <div className="absolute top-12 p-2 text-sm">Searching...</div>}
             
             {searchResults.length > 0 && (
               <div className="absolute top-12 w-full bg-white border rounded shadow-lg z-10">
@@ -216,16 +247,15 @@ export default function Home() {
                     <div className="flex flex-col">
                       <div className="font-semibold text-left">{result.title}</div>
                       <div className="text-sm text-gray-600 text-left">{result.author}</div>
-                      {/* <div className="text-xs text-blue-600">{result.genre}</div> */}
                     </div>
                   </div>
                 ))}
               </div>
             )}
-            {noResults && (
-            <div className="text-sm text-red-600 mt-2">
-              No results found.
-            </div>
+            {noResults && debouncedQuery && (
+              <div className="text-sm text-red-600 mt-2">
+                No results found.
+              </div>
             )}
           </div>
         </div>
@@ -236,7 +266,7 @@ export default function Home() {
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
           >
-            <SortableContext items={books} strategy={verticalListSortingStrategy}>
+            <SortableContext items={books.map(b => b.id)} strategy={verticalListSortingStrategy}>
               {books.map((book) => (
                 <SortableItem
                   key={book.id}
@@ -246,6 +276,13 @@ export default function Home() {
               ))}
             </SortableContext>
           </DndContext>
+          
+          {books.length === 0 && (
+            <div className="text-center text-gray-500 py-8">
+              <p>Your reading list is empty.</p>
+              <p className="text-sm">Search for books to add them to your list.</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
