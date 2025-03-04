@@ -234,80 +234,77 @@ export default function Home() {
           </button>
         </div>
 
-        {/* Mobile Content Area */}
-        <div className="flex-1">
-          {activeTab === 'controls' ? (
-            <div className="flex flex-col gap-4">
-              <Controls
-                userName={userName}
-                setUserName={setUserName}
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-                searchResults={searchResults}
-                isSearching={isSearching}
-                noResults={noResults}
-                handleSearchSelect={handleSearchSelect}
-                receiptStyle={receiptStyle}
-                setReceiptStyle={setReceiptStyle}
-                downloadReceipt={downloadReceipt}
-                isDownloading={isDownloading}
-                debouncedQuery={debouncedQuery}
-                randomizeBgPosition={randomizeBgPosition}
-              />
+        <div className={`${activeTab !== 'preview' ? 'absolute left-0 top-0 opacity-0 pointer-events-none' : 'flex justify-center'}`}>
+          <div className="w-full max-w-xs">
+            {receiptStyle === 'Bookie' && <BookieStyleReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition} />}
+            {receiptStyle === 'Receipt' && <ClassicReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition}/>}
+            {receiptStyle === 'Spotify' && <SpotifyStyleReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition}/>}
+            
+            {activeTab === 'preview' && (
+              <div className="mt-4 flex justify-center">
+                <button
+                  onClick={downloadReceipt}
+                  disabled={isDownloading}
+                  className="px-4 py-2 w-80 bg-red-600 text-white rounded font-medium disabled:bg-gray-300 disabled:cursor-not-allowed"
+                >
+                  {isDownloading ? 'Generating...' : 'Download Receipt'}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
 
-              <div className="bg-white p-4 shadow-lg rounded-lg">
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-lg font-bold m-0">Track List</h2>
-                  <button
-                    onClick={handleClearAll}
-                    className="px-1.5 py-1.5 text-sm text-red-500 hover:text-red-700 font-medium transition-colors"
-                  >
-                    Clear All
-                  </button>
-                </div>
-                <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                  <SortableContext items={books.map(b => b.id)} strategy={verticalListSortingStrategy}>
-                    {books.map((book) => (
-                      <SortableItem
-                        key={book.id}
-                        book={book}
-                        onRemove={handleRemoveBook}
-                      />
-                    ))}
-                  </SortableContext>
-                </DndContext>
-                
-                {books.length === 0 && (
-                  <div className="text-center text-gray-500 py-8">
-                    <p>Your reading list is empty.</p>
-                    <p className="text-sm">Search for books to add them to your list.</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          ) : (
-            <div className="flex justify-center">
-              <div className="w-full max-w-xs">
-                {receiptStyle === 'Bookie' && <BookieStyleReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition} />}
-                {receiptStyle === 'Receipt' && <ClassicReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition}/>}
-                {receiptStyle === 'Spotify' && <SpotifyStyleReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition}/>}
-                
-                <div className="mt-4 flex justify-center">
-                  <button
-                    onClick={downloadReceipt}
-                    disabled={isDownloading}
-                    className="px-4 py-2 w-80 bg-red-600 text-white rounded font-medium disabled:bg-gray-300 disabled:cursor-not-allowed"
-                  >
-                    {isDownloading ? 'Generating...' : 'Download Receipt'}
-                  </button>
-                </div>
-              </div>
+        <div className={activeTab !== 'controls' ? 'hidden' : 'flex flex-col gap-4'}>
+        <Controls
+          userName={userName}
+          setUserName={setUserName}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          searchResults={searchResults}
+          isSearching={isSearching}
+          noResults={noResults}
+          handleSearchSelect={handleSearchSelect}
+          receiptStyle={receiptStyle}
+          setReceiptStyle={setReceiptStyle}
+          downloadReceipt={downloadReceipt}
+          isDownloading={isDownloading}
+          debouncedQuery={debouncedQuery}
+          randomizeBgPosition={randomizeBgPosition}
+        />
+
+        <div className="bg-white p-4 shadow-lg rounded-lg">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-bold m-0">Track List</h2>
+            <button
+              onClick={handleClearAll}
+              className="px-1.5 py-1.5 text-sm text-red-500 hover:text-red-700 font-medium transition-colors"
+            >
+              Clear All
+            </button>
+          </div>
+          <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={books.map(b => b.id)} strategy={verticalListSortingStrategy}>
+              {books.map((book) => (
+                <SortableItem
+                  key={book.id}
+                  book={book}
+                  onRemove={handleRemoveBook}
+                />
+              ))}
+            </SortableContext>
+          </DndContext>
+          
+          {books.length === 0 && (
+            <div className="text-center text-gray-500 py-8">
+              <p>Your reading list is empty.</p>
+              <p className="text-sm">Search for books to add them to your list.</p>
             </div>
           )}
         </div>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
   // Desktop Layout (original)
   return (
