@@ -48,7 +48,7 @@ export default function Controls({
             className="w-full p-2 border rounded bg-gray-50 focus:ring-2 focus:ring-blue-400"
           />
 
-          {isSearching && <div className="text-sm text-red-600 mt-2">Searching...</div>}
+          {isSearching && <div className="text-sm text-black mt-2">Searching...</div>}
           
           {searchResults.length > 0 && (
             <div className="absolute top-12 w-full bg-white border rounded shadow-lg z-10">
