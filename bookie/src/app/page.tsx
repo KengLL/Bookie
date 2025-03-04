@@ -7,7 +7,7 @@ import { arrayMove, SortableContext, verticalListSortingStrategy, useSortable } 
 import { CSS } from '@dnd-kit/utilities';
 import Controls from './controls';
 import { Book, OLDoc, GBItem, IndustryIdentifier } from './types';
-import imagesLoaded from 'imagesloaded';
+//import imagesLoaded from 'imagesloaded';
 import BookieStyleReceipt from './receipt_style/bookie_style';
 import ClassicReceipt from './receipt_style/classic_style';
 import SpotifyStyleReceipt from './receipt_style/wrapped_style';
