@@ -7,7 +7,7 @@ import { arrayMove, SortableContext, verticalListSortingStrategy, useSortable } 
 import { CSS } from '@dnd-kit/utilities';
 import Controls from './controls';
 import { Book, OLDoc, GBItem, IndustryIdentifier } from './types';
-
+import imagesLoaded from 'imagesloaded';
 import BookieStyleReceipt from './receipt_style/bookie_style';
 import ClassicReceipt from './receipt_style/classic_style';
 import SpotifyStyleReceipt from './receipt_style/wrapped_style';
@@ -92,7 +92,14 @@ export default function Home() {
     
     try {
       setIsDownloading(true);
-      const dataUrl = await toPng(receiptRef.current);
+
+      await new Promise((resolve, reject) => {
+        const images = imagesLoaded(receiptRef.current!, { background: true });
+        images.on('done', resolve);
+        images.on('fail', reject);
+      });
+
+      const dataUrl = await toPng(receiptRef.current, {pixelRatio: 2});
       const link = document.createElement('a');
       link.download = `${userName}-${receiptStyle}.png`;
       link.href = dataUrl;
@@ -234,7 +241,7 @@ export default function Home() {
           </button>
         </div>
 
-        <div className={`${activeTab !== 'preview' ? 'absolute left-0 top-0 opacity-0 pointer-events-none' : 'flex justify-center'}`}>
+        <div className={`${activeTab !== 'preview' ? 'invisible absolute' : 'flex justify-center'}`}>
           <div className="w-full max-w-xs">
             {receiptStyle === 'Bookie' && <BookieStyleReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition} />}
             {receiptStyle === 'Receipt' && <ClassicReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition}/>}
