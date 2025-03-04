@@ -1,13 +1,12 @@
 'use client';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { toPng } from 'html-to-image';
 import { useDebounce } from 'use-debounce';
-import { DndContext, closestCenter } from '@dnd-kit/core';
+import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import BookieReceipt from './bookieReceipt';
 import Controls from './controls';
-import { Book } from './types';
+import { Book, OLDoc, GBItem, IndustryIdentifier } from './types';
 
 import BookieStyleReceipt from './receipt_style/bookie_style';
 import ClassicReceipt from './receipt_style/classic_style';
@@ -112,7 +111,7 @@ export default function Home() {
   };
 
   // Search and API logic
-  const searchBooks = async (query: string) => {
+  const searchBooks = useCallback(async (query: string) => {
     if (!query) return;
 
     setIsSearching(true);
@@ -125,7 +124,7 @@ export default function Home() {
     const olData = await olResponse.json();
     
     if (olData.docs?.length > 0) {
-      results = olData.docs.slice(0, 5).map((doc: any) => ({
+      results = olData.docs.slice(0, 5).map((doc: OLDoc) => ({
         title: doc.title,
         author: doc.author_name?.join(', ') || 'Unknown',
         genre: doc.subject?.slice(0, 2).join(', ') || 'General',
@@ -146,12 +145,12 @@ export default function Home() {
       const gbData = await gbResponse.json();
       
       if (gbData.items?.length > 0) {
-        results = gbData.items.slice(0, 5).map((item: any) => ({
+        results = gbData.items.slice(0, 5).map((item: GBItem) => ({
           title: item.volumeInfo.title,
           author: item.volumeInfo.authors?.join(', ') || 'Unknown',
           genre: item.volumeInfo.categories?.[0] || 'General',
-          publishYear: parseInt(item.volumeInfo.publishedDate?.substring(0, 4)) || new Date().getFullYear(),
-          isbn: item.volumeInfo.industryIdentifiers?.find((id: any) => id.type === 'ISBN_13')?.identifier,
+          publishYear: parseInt(item.volumeInfo.publishedDate?.substring(0, 4) ?? "0") || new Date().getFullYear(),
+          isbn: item.volumeInfo.industryIdentifiers?.find((id: IndustryIdentifier) => id.type === 'ISBN_13')?.identifier,
           pages: item.volumeInfo.pageCount,
           coverUrl: item.volumeInfo.imageLinks?.thumbnail || '/images/enchanted_book.jpg'
         }));
@@ -161,7 +160,7 @@ export default function Home() {
     setSearchResults(results);
     setNoResults(results.length === 0);
     setIsSearching(false);
-  };
+  }, [setIsSearching]);
 
   useEffect(() => {
     const savedBooks = localStorage.getItem('books');
@@ -187,7 +186,7 @@ export default function Home() {
     if (debouncedQuery) {
       searchBooks(debouncedQuery);
     }
-  }, [debouncedQuery]);
+  }, [debouncedQuery, searchBooks]);
 
   const handleSearchSelect = (book: Book) => {
     setBooks(prev => [...prev, { ...book, id: Date.now().toString() }]);
@@ -203,8 +202,9 @@ export default function Home() {
     setBooks([]);
   };
 
-  const handleDragEnd = (event: any) => {
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
+    if (!over) return;
     if (active.id !== over.id) {
       setBooks((items) => {
         const oldIndex = items.findIndex(i => i.id === active.id);

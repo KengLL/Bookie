@@ -1,6 +1,6 @@
 'use client';
 import { forwardRef, useEffect, useState } from 'react';
-import { Book, ReceiptProps } from '../types';
+import { ReceiptProps } from '../types';
 import { ReceiptContent } from '../receiptContent';
 
 const SpotifyStyleReceipt = forwardRef<HTMLDivElement, ReceiptProps>(({ books, userName }, ref) => {

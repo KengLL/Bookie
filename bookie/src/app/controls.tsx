@@ -1,5 +1,6 @@
 'use client';
 import { Book } from './types';
+import Image from 'next/image';
 
 interface ControlsProps {
   userName: string;
@@ -58,10 +59,12 @@ export default function Controls({
                   className="p-2 hover:bg-gray-100 cursor-pointer border-b flex items-center"
                 >
                   <div className="w-[75px] h-[100px] flex justify-center items-center overflow-hidden mr-4">
-                    <img 
-                      src={result.coverUrl} 
-                      alt={result.title}
-                      className="max-h-full max-w-full object-cover"
+                  <Image 
+                      src={result.coverUrl || "/images/enchanted_book.jpg"} // Fallback image
+                      alt={result.title || "Enchanted Book"}
+                      width={75} 
+                      height={100} 
+                      className="book-cover"
                     />
                   </div>
                   <div className="flex flex-col">

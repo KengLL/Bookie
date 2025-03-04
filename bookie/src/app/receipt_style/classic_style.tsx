@@ -1,6 +1,7 @@
 'use client';
 import { forwardRef, useEffect, useState } from 'react';
 import { ReceiptProps } from '../types';
+import Image from 'next/image';
 import "./classic.css";
 
 const ClassicReceipt = forwardRef<HTMLDivElement, ReceiptProps>(({ books, userName, bgPosition }, ref) => {
@@ -94,10 +95,12 @@ const ClassicReceipt = forwardRef<HTMLDivElement, ReceiptProps>(({ books, userNa
 
         <div className="text-center mt-4">
           <p className="text-[2em] leading-5 font-['Helvetica', 'Geneva', 'Tahoma', 'sans-serif';] mb-2">THANK YOU FOR VISITING!</p>
-          <img 
-            src="/images/barcode.png" 
-            alt="Barcode" 
-            className="w-[70%] mx-auto"
+          <Image
+            src="/images/barcode.png"
+            alt="Barcode"
+            width={210}
+            height={50} 
+            //className="w-[70%] mx-auto"
           />
           <p className="font-receipt text-[2em] lowercase leading-5">bookie.com</p>
         </div>
