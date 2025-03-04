@@ -1,4 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=Anonymous+Pro&display=swap');
 @import "tailwindcss";
+@import './font.css';
+
 
 @theme {
   --font-sans: var(--font-geist-sans);
@@ -20,5 +23,52 @@
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+.paper-texture {
+  background-image: url('/images/paper-texture1.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  position: relative;
+}
+
+/* Add a subtle overlay effect */
+.paper-texture::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 253, 245, 0.6);
+  z-index: 0;
+}
+
+.paper-texture > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Add some wrinkles and creases with pseudo-elements */
+.paper-texture::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    linear-gradient(to right, rgba(0,0,0,0.02) 0%, rgba(0,0,0,0) 20%, rgba(0,0,0,0.02) 60%, rgba(0,0,0,0) 100%),
+    linear-gradient(to bottom, rgba(0,0,0,0.03) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0.03) 70%, rgba(0,0,0,0) 100%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Subtle shadow to enhance the paper feel */
+.receipt-shadow {
+  box-shadow: 
+    0 2px 4px rgba(0,0,0,0.1),
+    0 0 0 1px rgba(0,0,0,0.05),
+    2px 2px 8px rgba(0,0,0,0.05);
 }

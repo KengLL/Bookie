@@ -1,0 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=Anonymous+Pro&display=swap');
+.receipt-container {
+    font-size: 10px;
+}
+
+.receipt-container td {
+    padding: 2px 10px;      /* 2px vertical padding, 10px horizontal padding */
+    vertical-align: top;    /* Align content to the top */
+}
+
+.receipt-container td:first-child {
+    padding-left: 0;
+}
+
+/* Remove right padding for last column */
+.receipt-container td:last-child {
+    padding-right: 0;
+    text-align: right;
+}
