@@ -317,7 +317,15 @@ export default function Home() {
         {receiptStyle === 'Receipt' && <ClassicReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition}/>}
         {receiptStyle === 'Spotify' && <SpotifyStyleReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition}/>}
       </div>
-
+      <p className="absolute bottom-4 left-4 text-sm text-gray-600">
+        Made by{' '}
+        <a href="https://kengll.github.io/about" className="hover:underline">Roger Lin</a>
+        <br />
+        Inspired by{' '}
+        <a href="https://receiptify.herokuapp.com/" className="hover:underline">Receiptify</a>{' '}
+        made by{' '}
+        <a href="https://michellexliu.me/" className="hover:underline">Michelle Liu</a>
+      </p>
       <div className="w-1/3 flex flex-col gap-6 text-black font-sans">
         <Controls
           userName={userName}
