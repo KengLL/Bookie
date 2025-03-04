@@ -65,6 +65,19 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<'controls' | 'preview'>('controls');
   const [isMobile, setIsMobile] = useState(false);
 
+  useEffect(() => {
+    // Preload critical images on component mount
+    const preloadImages = [
+      '/images/paper-texture1.jpg',
+      '/images/barcode.png'
+    ];
+  
+    preloadImages.forEach(src => {
+      const img = new Image();
+      img.src = src;
+    });
+  }, []);
+
   // Check window size on mount and resize
   useEffect(() => {
     const checkScreenSize = () => {
@@ -88,22 +101,38 @@ export default function Home() {
   };
 
   const downloadReceipt = async () => {
-    if (!receiptRef.current) return;
+  if (!receiptRef.current) return;
+
+  try {
+    setIsDownloading(true);
     
-    try {
-      setIsDownloading(true);
-      const dataUrl = await toPng(receiptRef.current);
-      const link = document.createElement('a');
-      link.download = `${userName}-${receiptStyle}.png`;
-      link.href = dataUrl;
-      link.click();
-    } catch (error) {
-      console.error('Error generating image:', error);
-      alert('Failed to generate receipt. Please try again.');
-    } finally {
-      setIsDownloading(false);
-    }
-  };
+    // Create temporary image elements to ensure loading
+    const bgImage = new Image();
+    bgImage.src = '/images/paper-texture1.jpg';
+    
+    const barcodeImage = new Image();
+    barcodeImage.src = '/images/barcode.png';
+
+    // Wait for both images to load
+    await Promise.all([
+      new Promise((resolve) => { bgImage.onload = resolve; }),
+      new Promise((resolve) => { barcodeImage.onload = resolve; })
+    ]);
+
+    // Add small delay to ensure DOM updates
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    const dataUrl = await toPng(receiptRef.current);
+    const link = document.createElement('a');
+    link.download = `${userName}-${receiptStyle}.png`;
+    link.href = dataUrl;
+    link.click();
+  } catch (error) {
+    console.error('Error generating image:', error);
+  } finally {
+    setIsDownloading(false);
+  }
+};
 
   const isValidISBN = (query: string) => {
     const cleaned = query.replace(/-/g, '');

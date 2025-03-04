@@ -1,7 +1,6 @@
 'use client';
 import { forwardRef, useEffect, useState } from 'react';
 import { ReceiptProps } from '../types';
-import Image from 'next/image';
 import "./classic.css";
 
 const ClassicReceipt = forwardRef<HTMLDivElement, ReceiptProps>(({ books, userName, bgPosition }, ref) => {
@@ -12,6 +11,11 @@ const ClassicReceipt = forwardRef<HTMLDivElement, ReceiptProps>(({ books, userNa
   });
 
   const totalAmount = books.reduce((sum, book) => sum + (book.pages / 100), 0).toFixed(2);
+
+  useEffect(() => {
+    const img = new Image();
+    img.src = '/images/paper-texture1.jpg';
+  }, []);
 
   useEffect(() => {
     const currentDate = new Date();
@@ -33,14 +37,20 @@ const ClassicReceipt = forwardRef<HTMLDivElement, ReceiptProps>(({ books, userNa
     <div className="receipt-container flex flex-col items-center">
       <div 
         ref={ref}
-        className="w-[340px] bg-[url('/images/paper-texture1.jpg')] p-5 shadow-lg uppercase"
+        className="w-[340px] p-5 shadow-lg uppercase relative"
         style={{ 
           fontFamily: 'MerchantCopy, Anonymous Pro, Courier New, Courier, monospace',
+          backgroundImage: 'url(/images/paper-texture1.jpg)',
           backgroundPosition: `${bgPosition.x}% ${bgPosition.y}%`, 
           backgroundSize: 'cover',
           backgroundRepeat: 'no-repeat'
         }}
       >
+        <div className="hidden">
+          <img src="/images/paper-texture1.jpg" alt="preloader" />
+          <img src="/images/barcode.png" alt="preloader" />
+        </div>
+
         <h2 className="text-[3.3em] text-center font-[600] mt-4 mb-4"
             style={{ fontFamily: "'Helvetica Neue', Helvetica, sans-serif" }}>
           RECEIPT
@@ -95,12 +105,10 @@ const ClassicReceipt = forwardRef<HTMLDivElement, ReceiptProps>(({ books, userNa
 
         <div className="text-center mt-4">
           <p className="text-[2em] leading-5 font-['Helvetica', 'Geneva', 'Tahoma', 'sans-serif';] mb-2">THANK YOU FOR VISITING!</p>
-          <Image
+          <img
             src="/images/barcode.png"
             alt="Barcode"
-            width={210}
-            height={50} 
-            className="w-[70%] h-auto max-w-[210px] mx-auto" 
+            className="w-[70%] h-auto max-w-[210px] mx-auto block"
           />
           <p className="font-receipt text-[2em] lowercase leading-5">bookie.com</p>
         </div>
