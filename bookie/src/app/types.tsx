@@ -12,4 +12,5 @@ export interface Book {
 export interface ReceiptProps {
     books: Book[];
     userName: string;
+    bgPosition: { x: number; y: number };
   }

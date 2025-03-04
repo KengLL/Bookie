@@ -63,6 +63,13 @@ export default function Home() {
   const [userName, setUserName] = useState("Bookworm");
   const [receiptStyle, setReceiptStyle] = useState<'Bookie' | 'Receipt' | 'Spotify'>('Receipt');
   const receiptRef = useRef<HTMLDivElement>(null);
+  const [bgPosition, setBgPosition] = useState({ x: 50, y: 50 });
+
+  const randomizeBgPosition = () => {
+    const x = Math.floor(Math.random() * 100);
+    const y = Math.floor(Math.random() * 100);
+    setBgPosition({ x, y });
+  };
 
   const downloadReceipt = async () => {
     if (!receiptRef.current) return;
@@ -140,6 +147,26 @@ export default function Home() {
   };
 
   useEffect(() => {
+    const savedBooks = localStorage.getItem('books');
+    if (savedBooks) {
+      setBooks(JSON.parse(savedBooks));
+    }
+
+    const savedName = localStorage.getItem('userName');
+    if (savedName) {
+      setUserName(savedName);
+    }
+  }, []);
+  
+  useEffect(() => {
+    localStorage.setItem('books', JSON.stringify(books));
+  }, [books]);
+
+  useEffect(() => {
+    localStorage.setItem('userName', userName);
+  }, [userName]);
+
+  useEffect(() => {
     if (debouncedQuery) {
       searchBooks(debouncedQuery);
     }
@@ -173,9 +200,9 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-100 p-8 flex justify-between gap-8 text-black">
       <div className="w-1/2">
-        {receiptStyle === 'Bookie' && <BookieStyleReceipt ref={receiptRef} books={books} userName={userName} />}
-        {receiptStyle === 'Receipt' && <ClassicReceipt ref={receiptRef} books={books} userName={userName} />}
-        {receiptStyle === 'Spotify' && <SpotifyStyleReceipt ref={receiptRef} books={books} userName={userName} />}
+        {receiptStyle === 'Bookie' && <BookieStyleReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition} />}
+        {receiptStyle === 'Receipt' && <ClassicReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition}/>}
+        {receiptStyle === 'Spotify' && <SpotifyStyleReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition}/>}
       </div>
 
       <div className="w-1/3 flex flex-col gap-6 text-black font-sans">
@@ -193,6 +220,7 @@ export default function Home() {
           downloadReceipt={downloadReceipt}
           isDownloading={isDownloading}
           debouncedQuery={debouncedQuery}
+          randomizeBgPosition={randomizeBgPosition}
         />
 
         <div className="bg-white p-6 shadow-lg rounded-lg">

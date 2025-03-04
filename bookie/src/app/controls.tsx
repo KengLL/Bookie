@@ -15,6 +15,7 @@ interface ControlsProps {
   downloadReceipt: () => void;
   isDownloading: boolean;
   debouncedQuery: string;
+  randomizeBgPosition: () => void; 
 }
 
 export default function Controls({
@@ -30,26 +31,11 @@ export default function Controls({
   setReceiptStyle,
   downloadReceipt,
   isDownloading,
-  debouncedQuery
+  debouncedQuery,
+  randomizeBgPosition
 }: ControlsProps) {
   return (
     <>
-      <div className="bg-white p-6 shadow-lg rounded-lg">
-        <h2 className="text-lg font-bold mb-4">User Settings</h2>
-        <div className="mb-4">
-          <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
-            Your Name
-          </label>
-          <input
-            type="text"
-            id="username"
-            value={userName}
-            onChange={(e) => setUserName(e.target.value)}
-            className="w-full p-2 border rounded bg-gray-50 focus:ring-2 focus:ring-blue-400"
-          />
-        </div>
-      </div>
-
       <div className="bg-white p-6 shadow-lg rounded-lg">
         <h2 className="text-lg font-bold mb-4">Search Books</h2>
         <div className="relative">
@@ -95,7 +81,30 @@ export default function Controls({
       </div>
 
       <div className="bg-white p-6 shadow-lg rounded-lg">
-        <div className="mb-4 space-x-2">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-bold mb-1">Customization</h2>
+          <div>
+            <button 
+              onClick={randomizeBgPosition}
+              className="px-1.5 py-1.5 text-sm text-red-500 hover:text-red-700 font-medium transition-colors"
+            >
+              Refresh Texture
+            </button>
+          </div>
+        </div>
+        <div className="mb-4">
+          <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+            Your Name
+          </label>
+          <input
+            type="text"
+            id="username"
+            value={userName}
+            onChange={(e) => setUserName(e.target.value)}
+            className="w-full p-2 border rounded bg-gray-50 focus:ring-2 focus:ring-blue-400"
+          />
+        </div>
+        <div className="py-2 mb-2 space-x-2">
         <button 
             onClick={() => setReceiptStyle('Receipt')} 
             className={`px-4 py-2 rounded ${receiptStyle === 'Receipt' ? 'bg-[#DCDCC6] text-black' : 'bg-gray-200 text-black'}`}

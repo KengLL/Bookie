@@ -3,7 +3,7 @@ import { forwardRef, useEffect, useState } from 'react';
 import { ReceiptProps } from '../types';
 import "./classic.css";
 
-const ClassicReceipt = forwardRef<HTMLDivElement, ReceiptProps>(({ books, userName }, ref) => {
+const ClassicReceipt = forwardRef<HTMLDivElement, ReceiptProps>(({ books, userName, bgPosition }, ref) => {
   const [receiptData, setReceiptData] = useState({
     date: '',
     orderNumber: '000',
@@ -33,11 +33,16 @@ const ClassicReceipt = forwardRef<HTMLDivElement, ReceiptProps>(({ books, userNa
       <div 
         ref={ref}
         className="w-[340px] bg-[url('/images/paper-texture1.jpg')] p-5 shadow-lg uppercase"
-        style={{ filter: 'brightness(100%)', fontFamily: 'MerchantCopy, Anonymous Pro, Courier New, Courier, monospace'}}
+        style={{ 
+          fontFamily: 'MerchantCopy, Anonymous Pro, Courier New, Courier, monospace',
+          backgroundPosition: `${bgPosition.x}% ${bgPosition.y}%`, 
+          backgroundSize: 'cover',
+          backgroundRepeat: 'no-repeat'
+        }}
       >
         <h2 className="text-[3.3em] text-center font-[600] mt-4 mb-4"
             style={{ fontFamily: "'Helvetica Neue', Helvetica, sans-serif" }}>
-          RECEIPTIFY
+          RECEIPT
         </h2>
 
         <p className="font-receipt text-[2em] -mb-3 leading-[2rem]">
