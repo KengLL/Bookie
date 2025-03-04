@@ -13,7 +13,6 @@ import BookieStyleReceipt from './receipt_style/bookie_style';
 import ClassicReceipt from './receipt_style/classic_style';
 import SpotifyStyleReceipt from './receipt_style/wrapped_style';
 
-
 // Sortable Item Component
 const SortableItem = ({ book, onRemove }: { book: Book; onRemove: (id: string) => void }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: book.id });
@@ -64,6 +63,24 @@ export default function Home() {
   const [receiptStyle, setReceiptStyle] = useState<'Bookie' | 'Receipt' | 'Spotify'>('Receipt');
   const receiptRef = useRef<HTMLDivElement>(null);
   const [bgPosition, setBgPosition] = useState({ x: 50, y: 50 });
+  const [activeTab, setActiveTab] = useState<'controls' | 'preview'>('controls');
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check window size on mount and resize
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 932); 
+    };
+    
+    // Initial check
+    checkScreenSize();
+    
+    // Add event listener for window resize
+    window.addEventListener('resize', checkScreenSize);
+    
+    // Cleanup
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
 
   const randomizeBgPosition = () => {
     const x = Math.floor(Math.random() * 100);
@@ -197,9 +214,105 @@ export default function Home() {
     }
   };
 
+  // Mobile Layout
+  if (isMobile) {
+    return (
+      <div className="min-h-screen bg-gray-100 p-4 flex flex-col text-black">
+        {/* Tab Navigation */}
+        <div className="flex mb-4 bg-white rounded shadow overflow-hidden">
+          <button 
+            className={`flex-1 py-3 font-medium ${activeTab === 'controls' ? 'bg-red-600 text-white' : 'bg-white text-gray-700'}`}
+            onClick={() => setActiveTab('controls')}
+          >
+            Edit List
+          </button>
+          <button 
+            className={`flex-1 py-3 font-medium ${activeTab === 'preview' ? 'bg-red-600 text-white' : 'bg-white text-gray-700'}`}
+            onClick={() => setActiveTab('preview')}
+          >
+            Preview
+          </button>
+        </div>
+
+        {/* Mobile Content Area */}
+        <div className="flex-1">
+          {activeTab === 'controls' ? (
+            <div className="flex flex-col gap-4">
+              <Controls
+                userName={userName}
+                setUserName={setUserName}
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                searchResults={searchResults}
+                isSearching={isSearching}
+                noResults={noResults}
+                handleSearchSelect={handleSearchSelect}
+                receiptStyle={receiptStyle}
+                setReceiptStyle={setReceiptStyle}
+                downloadReceipt={downloadReceipt}
+                isDownloading={isDownloading}
+                debouncedQuery={debouncedQuery}
+                randomizeBgPosition={randomizeBgPosition}
+              />
+
+              <div className="bg-white p-4 shadow-lg rounded-lg">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-lg font-bold m-0">Track List</h2>
+                  <button
+                    onClick={handleClearAll}
+                    className="px-1.5 py-1.5 text-sm text-red-500 hover:text-red-700 font-medium transition-colors"
+                  >
+                    Clear All
+                  </button>
+                </div>
+                <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                  <SortableContext items={books.map(b => b.id)} strategy={verticalListSortingStrategy}>
+                    {books.map((book) => (
+                      <SortableItem
+                        key={book.id}
+                        book={book}
+                        onRemove={handleRemoveBook}
+                      />
+                    ))}
+                  </SortableContext>
+                </DndContext>
+                
+                {books.length === 0 && (
+                  <div className="text-center text-gray-500 py-8">
+                    <p>Your reading list is empty.</p>
+                    <p className="text-sm">Search for books to add them to your list.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="flex justify-center">
+              <div className="w-full max-w-xs">
+                {receiptStyle === 'Bookie' && <BookieStyleReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition} />}
+                {receiptStyle === 'Receipt' && <ClassicReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition}/>}
+                {receiptStyle === 'Spotify' && <SpotifyStyleReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition}/>}
+                
+                <div className="mt-4 flex justify-center">
+                  <button
+                    onClick={downloadReceipt}
+                    disabled={isDownloading}
+                    className="px-4 py-2 w-80 bg-red-600 text-white rounded font-medium disabled:bg-gray-300 disabled:cursor-not-allowed"
+                  >
+                    {isDownloading ? 'Generating...' : 'Download Receipt'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop Layout (original)
   return (
-    <div className="min-h-screen bg-gray-100 p-8 flex justify-between gap-8 text-black">
-      <div className="w-1/2">
+    <div className="min-h-screen bg-gray-100 p-8 flex justify-center gap-8 text-black">
+      <div className="w-1/3">
         {receiptStyle === 'Bookie' && <BookieStyleReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition} />}
         {receiptStyle === 'Receipt' && <ClassicReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition}/>}
         {receiptStyle === 'Spotify' && <SpotifyStyleReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition}/>}
