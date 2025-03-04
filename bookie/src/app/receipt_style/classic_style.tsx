@@ -100,7 +100,7 @@ const ClassicReceipt = forwardRef<HTMLDivElement, ReceiptProps>(({ books, userNa
             alt="Barcode"
             width={210}
             height={50} 
-            //className="w-[70%] mx-auto"
+            className="w-[70%] h-auto max-w-[210px] mx-auto" 
           />
           <p className="font-receipt text-[2em] lowercase leading-5">bookie.com</p>
         </div>

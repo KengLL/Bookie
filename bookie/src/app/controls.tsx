@@ -65,6 +65,10 @@ export default function Controls({
                       width={75} 
                       height={100} 
                       className="book-cover"
+                      onError={(e) => {
+                        // Fallback to the enchanted book image if the URL fails
+                        e.currentTarget.src = "/images/enchanted_book.jpg";
+                      }}
                     />
                   </div>
                   <div className="flex flex-col">
