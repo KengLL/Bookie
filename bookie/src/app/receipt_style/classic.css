@@ -1,5 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Anonymous+Pro&display=swap');
 .receipt-container {
+    backface-visibility: hidden;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -o-crisp-edges;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
     font-size: 10px;
 }
 
