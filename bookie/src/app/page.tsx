@@ -263,7 +263,7 @@ export default function Home() {
           </button>
         </div>
 
-        <div className={`${activeTab !== 'preview' ? 'invisible absolute' : 'flex justify-center'}`}>
+        <div className={`${activeTab !== 'preview' ? 'absolute left-0 top-0 opacity-0 pointer-events-none' : 'flex justify-center'}`}>
           <div className="w-full max-w-xs">
             {receiptStyle === 'Bookie' && <BookieStyleReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition} />}
             {receiptStyle === 'Receipt' && <ClassicReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition}/>}
