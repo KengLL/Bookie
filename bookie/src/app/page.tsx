@@ -1,18 +1,16 @@
 'use client';
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { toPng } from 'html-to-image';
+import { toPng } from 'html-to-image'; 
 import { useDebounce } from 'use-debounce';
 import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import Controls from './controls';
 import { Book, OLDoc, GBItem, IndustryIdentifier } from './types';
-//import imagesLoaded from 'imagesloaded';
 import BookieStyleReceipt from './receipt_style/bookie_style';
 import ClassicReceipt from './receipt_style/classic_style';
 import SpotifyStyleReceipt from './receipt_style/wrapped_style';
 
-// Sortable Item Component
 const SortableItem = ({ book, onRemove }: { book: Book; onRemove: (id: string) => void }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: book.id });
 
@@ -51,102 +49,108 @@ const SortableItem = ({ book, onRemove }: { book: Book; onRemove: (id: string) =
 };
 
 export default function Home() {
+  // Device detection
+  const [isMobile, setIsMobile] = useState(false);
+
+  // User data and preferences
+  const [userName, setUserName] = useState("Bookworm");
+  const [bgPosition, setBgPosition] = useState({ x: 50, y: 50 });
+  const [receiptStyle, setReceiptStyle] = useState<'Bookie' | 'Receipt' | 'Spotify'>('Receipt');
+
+  // Book list management
+  const [books, setBooks] = useState<Book[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [debouncedQuery] = useDebounce(searchQuery, 500);
   const [searchResults, setSearchResults] = useState<Book[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [noResults, setNoResults] = useState(false);
-  const [isDownloading, setIsDownloading] = useState(false);
-  const [books, setBooks] = useState<Book[]>([]);
-  const [userName, setUserName] = useState("Bookworm");
-  const [receiptStyle, setReceiptStyle] = useState<'Bookie' | 'Receipt' | 'Spotify'>('Receipt');
+  const [debouncedQuery] = useDebounce(searchQuery, 500);
+
+  // Image generation state
   const receiptRef = useRef<HTMLDivElement>(null);
-  const [bgPosition, setBgPosition] = useState({ x: 50, y: 50 });
+  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+  const [generatingOrDownloading, setGeneratingOrDownloading] = useState(false);
   const [activeTab, setActiveTab] = useState<'controls' | 'preview'>('controls');
-  const [isMobile, setIsMobile] = useState(false);
 
+  // Responsive layout detection
   useEffect(() => {
-    // Preload critical images on component mount
-    const preloadImages = [
-      '/images/paper-texture1.jpg',
-      '/images/barcode.png'
-    ];
-  
-    preloadImages.forEach(src => {
-      const img = new Image();
-      img.src = src;
-    });
-  }, []);
-
-  // Check window size on mount and resize
-  useEffect(() => {
-    const checkScreenSize = () => {
-      setIsMobile(window.innerWidth < 932); 
-    };
-    
-    // Initial check
+    const checkScreenSize = () => setIsMobile(window.innerWidth < 932);
     checkScreenSize();
-    
-    // Add event listener for window resize
     window.addEventListener('resize', checkScreenSize);
-    
-    // Cleanup
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
-  const randomizeBgPosition = () => {
-    const x = Math.floor(Math.random() * 100);
-    const y = Math.floor(Math.random() * 100);
-    setBgPosition({ x, y });
+  // Local storage handling
+  useEffect(() => {
+    const savedBooks = localStorage.getItem('books');
+    const savedName = localStorage.getItem('userName');
+    if (savedBooks) setBooks(JSON.parse(savedBooks));
+    if (savedName) setUserName(savedName);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('books', JSON.stringify(books));
+  }, [books]);
+
+  useEffect(() => {
+    localStorage.setItem('userName', userName);
+  }, [userName]);
+
+  // Image generation logic
+  const generateImage = async () =>{
+    if (!receiptRef.current) return;
+
+    try {
+      setGeneratingOrDownloading(true);
+      // Safari & html-to-image issue, check: https://github.com/bubkoo/html-to-image/issues/361
+      await toPng(receiptRef.current);
+      await toPng(receiptRef.current);
+      await toPng(receiptRef.current);
+      const dataUrl = await toPng(receiptRef.current);
+      setGeneratedImage(dataUrl);
+    } catch (error) {
+      console.error('Error generating image:', error);
+      alert('Failed to generate receipt. Please try again.');
+    } finally {
+      setGeneratingOrDownloading(false);
+    }
+  };
+  
+  // Generate on mount
+  useEffect(() => {
+    generateImage();
+  }, []);
+
+  // Regenerate when state update
+  useEffect(() => {
+    generateImage();
+  },[userName, books, receiptStyle]);
+
+  // Download generated Image
+  const downloadReceipt = () => {
+    if (!generatedImage) return;
+
+    try {
+      setGeneratingOrDownloading(true);
+      const link = document.createElement('a');
+      link.download = `${userName}-${receiptStyle}.png`;
+      link.href = generatedImage;
+      link.click();
+    } catch (error) {
+      console.error('Error downloading image:', error);
+      alert('Failed to download receipt. Please try again.');
+    } finally {
+      setGeneratingOrDownloading(false);
+    }
   };
 
-  const downloadReceipt = async () => {
-  if (!receiptRef.current) return;
-
-  try {
-    setIsDownloading(true);
-    
-    // Create temporary image elements to ensure loading
-    const bgImage = new Image();
-    bgImage.src = '/images/paper-texture1.jpg';
-    
-    const barcodeImage = new Image();
-    barcodeImage.src = '/images/barcode.png';
-
-    // Wait for both images to load
-    await Promise.all([
-      new Promise((resolve) => { bgImage.onload = resolve; }),
-      new Promise((resolve) => { barcodeImage.onload = resolve; })
-    ]);
-
-    // Add small delay to ensure DOM updates
-    await new Promise(resolve => setTimeout(resolve, 100));
-
-    const dataUrl = await toPng(receiptRef.current);
-    const link = document.createElement('a');
-    link.download = `${userName}-${receiptStyle}.png`;
-    link.href = dataUrl;
-    link.click();
-  } catch (error) {
-    console.error('Error generating image:', error);
-  } finally {
-    setIsDownloading(false);
-  }
-};
-
-  const isValidISBN = (query: string) => {
-    const cleaned = query.replace(/-/g, '');
-    return cleaned.length === 10 || cleaned.length === 13;
-  };
-
-  // Search and API logic
+  // Book Search functionality
   const searchBooks = useCallback(async (query: string) => {
     if (!query) return;
 
     setIsSearching(true);
     let results: Book[] = [];
 
-    // Try Open Library first
+    // Open Library search
     const olResponse = await fetch(
       `https://openlibrary.org/search.json?${isValidISBN(query) ? `isbn=${query}` : `title=${encodeURIComponent(query)}`}`
     );
@@ -166,7 +170,7 @@ export default function Home() {
       }));
     }
 
-    // Fallback to Google Books
+    // Google Books fallback
     if (results.length === 0) {
       const gbResponse = await fetch(
         `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}`
@@ -191,44 +195,22 @@ export default function Home() {
     setIsSearching(false);
   }, [setIsSearching]);
 
-  useEffect(() => {
-    const savedBooks = localStorage.getItem('books');
-    if (savedBooks) {
-      setBooks(JSON.parse(savedBooks));
-    }
-
-    const savedName = localStorage.getItem('userName');
-    if (savedName) {
-      setUserName(savedName);
-    }
-  }, []);
-  
-  useEffect(() => {
-    localStorage.setItem('books', JSON.stringify(books));
-  }, [books]);
-
-  useEffect(() => {
-    localStorage.setItem('userName', userName);
-  }, [userName]);
-
-  useEffect(() => {
-    if (debouncedQuery) {
-      searchBooks(debouncedQuery);
-    }
-  }, [debouncedQuery, searchBooks]);
-
+  // Event handlers
   const handleSearchSelect = (book: Book) => {
     setBooks(prev => [...prev, { ...book, id: Date.now().toString() }]);
     setSearchQuery('');
     setSearchResults([]);
+    generateImage();
   };
 
   const handleRemoveBook = (id: string) => {
     setBooks(prev => prev.filter(book => book.id !== id));
+    generateImage();
   };
 
   const handleClearAll = () => {
     setBooks([]);
+    generateImage();
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -241,7 +223,27 @@ export default function Home() {
         return arrayMove(items, oldIndex, newIndex);
       });
     }
+    generateImage();
   };
+
+  const randomizeBgPosition = () => {
+    const x = Math.floor(Math.random() * 100);
+    const y = Math.floor(Math.random() * 100);
+    setBgPosition({ x, y });
+  };
+
+  // Helper functions
+  const isValidISBN = (query: string) => {
+    const cleaned = query.replace(/-/g, '');
+    return cleaned.length === 10 || cleaned.length === 13;
+  };
+
+  useEffect(() => {
+    if (debouncedQuery) {
+      searchBooks(debouncedQuery);
+    }
+  }, [debouncedQuery, searchBooks]);
+
 
   // Mobile Layout
   if (isMobile) {
@@ -273,10 +275,10 @@ export default function Home() {
               <div className="mt-4 flex justify-center">
                 <button
                   onClick={downloadReceipt}
-                  disabled={isDownloading}
+                  disabled={generatingOrDownloading}
                   className="px-4 py-2 w-80 bg-red-600 text-white rounded font-medium disabled:bg-gray-300 disabled:cursor-not-allowed"
                 >
-                  {isDownloading ? 'Generating...' : 'Download Receipt'}
+                  {generatingOrDownloading ? 'Generating...' : 'Download Receipt'}
                 </button>
               </div>
             )}
@@ -296,7 +298,7 @@ export default function Home() {
           receiptStyle={receiptStyle}
           setReceiptStyle={setReceiptStyle}
           downloadReceipt={downloadReceipt}
-          isDownloading={isDownloading}
+          generatingOrDownloading={generatingOrDownloading}
           debouncedQuery={debouncedQuery}
           randomizeBgPosition={randomizeBgPosition}
         />
@@ -365,7 +367,7 @@ export default function Home() {
           receiptStyle={receiptStyle}
           setReceiptStyle={setReceiptStyle}
           downloadReceipt={downloadReceipt}
-          isDownloading={isDownloading}
+          generatingOrDownloading={generatingOrDownloading}
           debouncedQuery={debouncedQuery}
           randomizeBgPosition={randomizeBgPosition}
         />

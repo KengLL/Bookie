@@ -14,7 +14,7 @@ interface ControlsProps {
   receiptStyle: 'Bookie' | 'Receipt' | 'Spotify';
   setReceiptStyle: (style: 'Bookie' | 'Receipt' | 'Spotify') => void;
   downloadReceipt: () => void;
-  isDownloading: boolean;
+  generatingOrDownloading: boolean;
   debouncedQuery: string;
   randomizeBgPosition: () => void; 
 }
@@ -31,7 +31,7 @@ export default function Controls({
   receiptStyle,
   setReceiptStyle,
   downloadReceipt,
-  isDownloading,
+  generatingOrDownloading,
   debouncedQuery,
   randomizeBgPosition
 }: ControlsProps) {
@@ -133,12 +133,12 @@ export default function Controls({
         </div>
         <button 
           onClick={downloadReceipt}
-          disabled={isDownloading}
+          disabled={generatingOrDownloading}
           className={`w-full mt-2 px-6 py-2 bg-red-600 text-white rounded transition-colors ${
-            isDownloading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-red-700'
+            generatingOrDownloading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-red-700'
           }`}
         >
-          {isDownloading ? 'Generating...' : 'Download Receipt'}
+          {generatingOrDownloading ? 'Generating...' : 'Download Receipt'}
         </button>
       </div>
     </>
