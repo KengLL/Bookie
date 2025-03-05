@@ -111,7 +111,7 @@ export default function Controls({
             className="w-full p-2 border rounded bg-gray-50 focus:ring-2 focus:ring-blue-400"
           />
         </div>
-        <div className="py-2 mb-2 space-x-2">
+        <div className="py-2 mb-2 space-y-2 space-x-2">
         <button 
             onClick={() => setReceiptStyle('Receipt')} 
             className={`px-4 py-2 rounded ${receiptStyle === 'Receipt' ? 'bg-[#DCDCC6] text-black' : 'bg-gray-200 text-black'}`}
