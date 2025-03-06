@@ -69,7 +69,7 @@ const ImageDropbox: React.FC<ImageDropboxProps> = ({ onImageSelect, currentImage
               {isDragActive ? 'Drop your image here' : 'Upload a photo of your books for analysis'}
             </p>
             <p className="text-sm text-gray-500 mt-1">
-              We'll try to identify book titles in your image
+              We&apos;ll try to identify book titles in your image
             </p> 
           </div>
         )}
