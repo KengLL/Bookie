@@ -1,6 +1,6 @@
 'use client';
 import { forwardRef, useEffect, useState } from 'react';
-import { ReceiptProps } from '../types';
+import { ReceiptProps } from '../components/types';
 import "./classic.css";
 
 const ClassicReceipt = forwardRef<HTMLDivElement, ReceiptProps>(({ books, userName, bgPosition }, ref) => {

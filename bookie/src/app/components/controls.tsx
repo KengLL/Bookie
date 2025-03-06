@@ -1,3 +1,4 @@
+// 'src/app/components/controls.tsx'
 'use client';
 import { Book } from './types';
 import Image from 'next/image';

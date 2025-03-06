@@ -1,4 +1,4 @@
-import { Book } from './types';
+import { Book } from './components/types';
 
 interface ReceiptContentProps {
   books: Book[];
