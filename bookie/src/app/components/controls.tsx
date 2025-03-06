@@ -2,9 +2,13 @@
 'use client';
 import { Book } from './types';
 import Image from 'next/image';
+import ImageDropbox from './imageDropbox';
 
 interface ControlsProps {
   userName: string;
+  userImage: string | null;
+  isProcessingImage: boolean;
+  handleImageUpload: (file: File, dataUrl: string) => void;
   setUserName: (name: string) => void;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
@@ -22,10 +26,12 @@ interface ControlsProps {
 
 export default function Controls({
   userName,
+  userImage,
   setUserName,
   searchQuery,
   setSearchQuery,
   searchResults,
+  isProcessingImage,
   isSearching,
   noResults,
   handleSearchSelect,
@@ -34,14 +40,27 @@ export default function Controls({
   downloadReceipt,
   generatingOrDownloading,
   debouncedQuery,
-  randomizeBgPosition
+  randomizeBgPosition,
+  handleImageUpload
 }: ControlsProps) {
   return (
     <>
+      
       <div className="bg-white p-6 shadow-lg rounded-lg">
-        <h2 className="text-lg font-bold mb-4">Search Books</h2>
-        <div className="relative">
+        <h2 className="text-lg font-bold mb-3">Add Books</h2>
+
+        <ImageDropbox 
+          onImageSelect={handleImageUpload}
+          currentImage={userImage}
+          isProcessingImage={isProcessingImage}
+        />
+        
+        <div className="mt-4 relative">
+          <label htmlFor="book-search" className="block text-sm font-medium text-gray-700 mb-2">
+            Search Books Manually
+          </label>
           <input
+            id="book-search"
             type="text"
             placeholder="Search by title or ISBN..."
             value={searchQuery}
@@ -89,7 +108,7 @@ export default function Controls({
       </div>
 
       <div className="bg-white p-6 shadow-lg rounded-lg">
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-center mb-2">
           <h2 className="text-lg font-bold mb-1">Customization</h2>
           <div>
             <button 
@@ -100,7 +119,7 @@ export default function Controls({
             </button>
           </div>
         </div>
-        <div className="mb-4">
+        <div className="mb-3">
           <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
             Your Name
           </label>
@@ -134,12 +153,12 @@ export default function Controls({
         </div>
         <button 
           onClick={downloadReceipt}
-          disabled={generatingOrDownloading}
-          className={`w-full mt-2 px-6 py-2 bg-red-600 text-white rounded transition-colors ${
+          disabled={generatingOrDownloading||isProcessingImage}
+          className={`w-full mt-0 px-6 py-2 bg-red-600 text-white rounded transition-colors ${
             generatingOrDownloading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-red-700'
           }`}
         >
-          {generatingOrDownloading ? 'Generating...' : 'Download Receipt'}
+          {generatingOrDownloading ? 'Generating...' : isProcessingImage ? 'Processing...' : 'Download Receipt'}
         </button>
       </div>
     </>

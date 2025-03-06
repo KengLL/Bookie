@@ -15,10 +15,10 @@ export default function TrackList({ books, onRemove, onDragEnd, onClearAll }: Tr
   return (
     <div className="bg-white p-4 shadow-lg rounded-lg">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-bold m-0">Track List</h2>
+        <h2 className="text-lg ml-2 font-bold m-0">Track List</h2>
         <button
           onClick={onClearAll}
-          className="px-1.5 py-1.5 text-sm text-red-500 hover:text-red-700 font-medium transition-colors"
+          className="px-1.5 py-1.5 mr-2 text-sm text-red-500 hover:text-red-700 font-medium transition-colors"
         >
           Clear All
         </button>

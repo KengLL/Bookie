@@ -9,7 +9,12 @@ export interface Book {
     coverUrl?: string;
   }
 
-export interface ReceiptProps {
+export interface Image {
+    file?: File;
+    url: string | null;
+  }
+
+  export interface ReceiptProps {
     books: Book[];
     userName: string;
     bgPosition: { x: number; y: number };

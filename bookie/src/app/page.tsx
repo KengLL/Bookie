@@ -24,11 +24,13 @@ export default function Home() {
 
   // Book list management
   const [books, setBooks] = useLocalStorage<Book[]>('books', []);
+  const [userImage, setUserImage] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Book[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [noResults, setNoResults] = useState(false);
   const [debouncedQuery] = useDebounce(searchQuery, 500);
+  const [isProcessingImage, setIsProcessingImage] = useState<boolean>(false);
 
   // Image generation state
   const receiptRef = useRef<HTMLDivElement>(null!);
@@ -112,6 +114,47 @@ export default function Home() {
     setBgPosition({ x, y });
   };
 
+  const handleImageUpload = async (file: File, dataUrl: string) => {
+    setUserImage(dataUrl);
+    setIsProcessingImage(true);
+    
+    // In a real implementation, you would send the image to your OCR service here
+    // For now, we'll just simulate processing with a timeout
+    
+    // Simulate image processing and book detection
+    setTimeout(() => {
+      // For demonstration: pretend we found some books in the image
+      // In a real implementation, you'd get this data from your OCR/AI service
+      const mockDetectedBooks: Book[] = [
+        {
+          id: 'detected-1',
+          title: 'The Great Gatsby',
+          author: 'F. Scott Fitzgerald',
+          coverUrl: 'https://covers.openlibrary.org/b/id/8759255-M.jpg',
+          publishYear: 1925,
+          genre: 'General',
+          pages: 696
+        },
+        {
+          id: 'detected-2',
+          title: 'To Kill a Mockingbird',
+          author: 'Harper Lee',
+          coverUrl: 'https://covers.openlibrary.org/b/id/12000553-M.jpg',
+          publishYear: 1960,
+          genre: 'General',
+          pages: 696
+        }
+      ];
+      
+      // Add the detected books to our current book list
+      setBooks(prevBooks => [...prevBooks, ...mockDetectedBooks]);
+      setIsProcessingImage(false);
+      
+      // In a real implementation, you might want to show the user which books were detected
+      // and allow them to confirm or edit the results
+    }, 2000);
+  };
+
   // Mobile Layout
   if (isMobile) {
     return (
@@ -142,10 +185,10 @@ export default function Home() {
               <div className="mt-4 flex justify-center">
                 <button
                   onClick={handleDownload}
-                  disabled={generatingOrDownloading}
+                  disabled={generatingOrDownloading||isProcessingImage}
                   className="px-4 py-2 w-80 bg-red-600 text-white rounded font-medium disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-red-700"
                 >
-                  {generatingOrDownloading ? 'Generating...' : 'Download Receipt'}
+                  {generatingOrDownloading ? 'Generating...' : isProcessingImage ? 'Processing...' : 'Download Receipt'}
                 </button>
               </div>
             )}
@@ -155,6 +198,9 @@ export default function Home() {
         <div className={activeTab !== 'controls' ? 'hidden' : 'flex flex-col gap-4'}>
         <Controls
           userName={userName}
+          userImage={userImage}
+          isProcessingImage={isProcessingImage}
+          handleImageUpload={handleImageUpload}
           setUserName={setUserName}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
@@ -188,7 +234,7 @@ export default function Home() {
         {receiptStyle === 'Receipt' && <ClassicReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition}/>}
         {receiptStyle === 'Spotify' && <SpotifyStyleReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition}/>}
       </div>
-      <p className="absolute bottom-4 left-4 text-sm text-gray-600">
+      <p className="fixed bottom-4 left-4 text-sm text-gray-600">
         Made by{' '}
         <a href="https://kengll.github.io/about" className="hover:underline">Roger Lin</a>
         <br />
@@ -200,6 +246,9 @@ export default function Home() {
       <div className="w-1/3 flex flex-col gap-6 text-black font-sans">
         <Controls
           userName={userName}
+          userImage={userImage}
+          isProcessingImage={isProcessingImage}
+          handleImageUpload={handleImageUpload}
           setUserName={setUserName}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
