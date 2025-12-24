@@ -1,6 +1,6 @@
 //'src/app/page.tsx'
 'use client';
-import { useState, useEffect, useRef, useCallback, Suspense } from 'react';
+import { useState, useEffect, useRef, useCallback, Suspense, Dispatch, SetStateAction } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useDebounce } from 'use-debounce';
 import { DragEndEvent } from '@dnd-kit/core';
@@ -18,7 +18,7 @@ function URLReceiver({
   setBooks, 
   setUserName 
 }: { 
-  setBooks: (b: any) => void, 
+  setBooks: Dispatch<SetStateAction<Book[]>>,
   setUserName: (n: string) => void 
 }) {
   const searchParams = useSearchParams();
@@ -35,13 +35,13 @@ function URLReceiver({
       try {
         const parsedBooks = JSON.parse(dataParam);
         // Map incoming data to ensure it fits the Book type (adding IDs if needed)
-        const formattedBooks = parsedBooks.map((b: any, index: number) => ({
+        const formattedBooks = parsedBooks.map((b: Partial<Book>, index: number) => ({
           ...b,
           id: b.id || `imported-${Date.now()}-${index}`,
           // Ensure defaults if source data is missing fields
           pages: b.pages || 0,
           genre: b.genre || 'General',
-          publishYear: b.publishYear || null
+          publishYear: b.publishYear ?? null
         }));
         
         setBooks(formattedBooks);

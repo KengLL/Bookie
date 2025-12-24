@@ -46,7 +46,11 @@ export function useImageGenerator<T extends readonly unknown[]>(
     } finally {
       setGeneratingOrDownloading(false);
     }
-  }, [receiptRef, ...dependencies]);
+  }, [receiptRef]);
+
+  // Create a stable key from dependencies so we can watch them without
+  // using a spread in dependency arrays (which ESLint can't verify).
+  const _depKey = JSON.stringify(dependencies);
 
   /**
    * Downloads the generated image with a custom filename
@@ -76,7 +80,7 @@ export function useImageGenerator<T extends readonly unknown[]>(
   // Generate image when dependency values change
   useEffect(() => {
     generateImage();
-  }, [generateImage]);
+  }, [generateImage, _depKey]);
 
   return {
     generateImage,
