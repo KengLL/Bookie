@@ -1,6 +1,7 @@
 //'src/app/page.tsx'
 'use client';
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useDebounce } from 'use-debounce';
 import { DragEndEvent } from '@dnd-kit/core';
 import { arrayMove} from '@dnd-kit/sortable';
@@ -12,6 +13,49 @@ import { useImageGenerator } from './hooks/useImageGenerator';
 import BookieStyleReceipt from './receipt_style/bookie_style';
 import ClassicReceipt from './receipt_style/classic_style';
 import SpotifyStyleReceipt from './receipt_style/wrapped_style';
+
+function URLReceiver({ 
+  setBooks, 
+  setUserName 
+}: { 
+  setBooks: (b: any) => void, 
+  setUserName: (n: string) => void 
+}) {
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const dataParam = searchParams.get('data');
+    const userParam = searchParams.get('user');
+
+    if (userParam) {
+      setUserName(userParam);
+    }
+
+    if (dataParam) {
+      try {
+        const parsedBooks = JSON.parse(dataParam);
+        // Map incoming data to ensure it fits the Book type (adding IDs if needed)
+        const formattedBooks = parsedBooks.map((b: any, index: number) => ({
+          ...b,
+          id: b.id || `imported-${Date.now()}-${index}`,
+          // Ensure defaults if source data is missing fields
+          pages: b.pages || 0,
+          genre: b.genre || 'General',
+          publishYear: b.publishYear || null
+        }));
+        
+        setBooks(formattedBooks);
+        
+        // Optional: Clean URL after import so refreshing doesn't re-import
+        window.history.replaceState({}, '', '/');
+      } catch (e) {
+        console.error("Failed to parse receipt data", e);
+      }
+    }
+  }, [searchParams, setBooks, setUserName]);
+
+  return null; // This component doesn't render anything visible
+}
 
 export default function Home() {
   // Device detection
@@ -183,6 +227,9 @@ export default function Home() {
   // Desktop Layout (original)
   return (
     <div className="min-h-screen bg-gray-100 p-8 flex justify-center gap-8 text-black">
+      <Suspense fallback={null}>
+        <URLReceiver setBooks={setBooks} setUserName={setUserName} />
+      </Suspense>
       <div className="w-1/3">
         {receiptStyle === 'Bookie' && <BookieStyleReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition} />}
         {receiptStyle === 'Receipt' && <ClassicReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition}/>}

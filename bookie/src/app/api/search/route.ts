@@ -19,30 +19,30 @@ export async function GET(request: Request) {
   };
 
   // Open Library search
-  try {
-    const olEndpoint = `https://openlibrary.org/search.json?${isValidISBN(query) ? `isbn=${query}` : `title=${encodeURIComponent(query)}`}`;
-    const olResponse = await fetch(olEndpoint);
-    const olData = await olResponse.json();
+  // try {
+  //   const olEndpoint = `https://openlibrary.org/search.json?${isValidISBN(query) ? `isbn=${query}` : `title=${encodeURIComponent(query)}`}`;
+  //   const olResponse = await fetch(olEndpoint);
+  //   const olData = await olResponse.json();
 
-    if (olData.docs?.length > 0) {
-      results = olData.docs.slice(0, 5).map((doc: OLDoc) => ({
-        title: doc.title,
-        author: doc.author_name?.join(', ') || 'Unknown',
-        genre: doc.subject?.slice(0, 2).join(', ') || 'General',
-        publishYear: doc.first_publish_year || (doc.publish_year ? doc.publish_year[0] : new Date().getFullYear()),
-        pages: doc.number_of_pages || 199,
-        isbn: doc.isbn?.[0],
-        coverUrl: doc.cover_i 
-          ? `https://covers.openlibrary.org/b/id/${doc.cover_i}-M.jpg`
-          : '/images/enchanted_book.jpg'
-      }));
-    }
-  } catch (error) {
-    console.error('Error fetching from Open Library:', error);
-  }
+  //   if (olData.docs?.length > 0) {
+  //     results = olData.docs.slice(0, 5).map((doc: OLDoc) => ({
+  //       title: doc.title,
+  //       author: doc.author_name?.join(', ') || 'Unknown',
+  //       genre: doc.subject?.slice(0, 2).join(', ') || 'General',
+  //       publishYear: doc.first_publish_year || (doc.publish_year ? doc.publish_year[0] : new Date().getFullYear()),
+  //       pages: doc.number_of_pages || 199,
+  //       isbn: doc.isbn?.[0],
+  //       coverUrl: doc.cover_i 
+  //         ? `https://covers.openlibrary.org/b/id/${doc.cover_i}-M.jpg`
+  //         : '/images/enchanted_book.jpg'
+  //     }));
+  //   }
+  // } catch (error) {
+  //   console.error('Error fetching from Open Library:', error);
+  // }
 
-  // Google Books fallback
-  if (results.length === 0) {
+  // // Google Books fallback
+  // if (results.length === 0) {
     try {
       const gbEndpoint = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}`;
       const gbResponse = await fetch(gbEndpoint);
@@ -62,7 +62,7 @@ export async function GET(request: Request) {
     } catch (error) {
       console.error('Error fetching from Google Books:', error);
     }
-  }
+  //}
 
   return NextResponse.json({ results });
 }
