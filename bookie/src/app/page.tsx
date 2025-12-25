@@ -80,6 +80,7 @@ export default function Home() {
   const {
     downloadReceipt,
     generatingOrDownloading,
+    generatedImage,
   } = useImageGenerator(receiptRef, [userName, books, receiptStyle]);
 
   const [activeTab, setActiveTab] = useState<'controls' | 'preview'>('controls');
@@ -94,7 +95,11 @@ export default function Home() {
 
   // Handle receipt download
   const handleDownload = () => {
-    downloadReceipt({ userName, receiptStyle });
+    if (isMobile) {
+      setActiveTab('preview');
+    } else {
+      downloadReceipt({ userName, receiptStyle });
+    }
   };
 
   // Book Search functionality
@@ -180,21 +185,36 @@ export default function Home() {
         </div>
 
         <div className={`${activeTab !== 'preview' ? 'absolute left-0 top-0 opacity-0 pointer-events-none' : 'flex justify-center'}`}>
-          <div className="w-full max-w-xs">
-            {receiptStyle === 'Bookie' && <BookieStyleReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition} />}
-            {receiptStyle === 'Receipt' && <ClassicReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition}/>}
-            {receiptStyle === 'Spotify' && <SpotifyStyleReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition}/>}
+          <div className="w-full max-w-xs relative">
+            <div className={generatedImage ? 'absolute top-0 left-0 w-full -z-10 pointer-events-none' : ''}>
+              {receiptStyle === 'Bookie' && <BookieStyleReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition} />}
+              {receiptStyle === 'Receipt' && <ClassicReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition}/>}
+              {receiptStyle === 'Spotify' && <SpotifyStyleReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition}/>}
+            </div>
+
+            {generatedImage && (
+              <img 
+                src={generatedImage} 
+                alt="Receipt Preview" 
+                className="w-full h-auto shadow-lg"
+              />
+            )}
             
             {activeTab === 'preview' && (
-              <div className="mt-4 flex justify-center">
-                <button
-                  onClick={handleDownload}
-                  disabled={generatingOrDownloading}
-                  className="px-4 py-2 w-80 bg-red-600 text-white rounded font-medium disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-red-700"
-                >
-                  {generatingOrDownloading ? 'Generating...' : 'Download Receipt'}
-                </button>
-              </div>
+              <>
+                <p className="text-gray-500 text-xs mt-2 mb-2 animate-pulse text-center">
+                  Long press the receipt to save image
+                </p>
+                {/* <div className="mt-4 flex justify-center">
+                  <button
+                    onClick={handleDownload}
+                    disabled={generatingOrDownloading}
+                    className="px-4 py-2 w-80 bg-red-600 text-white rounded font-medium disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-red-700"
+                  >
+                    {generatingOrDownloading ? 'Generating...' : 'Download Receipt'}
+                  </button>
+                </div> */}
+              </>
             )}
           </div>
         </div>
@@ -215,6 +235,7 @@ export default function Home() {
           generatingOrDownloading={generatingOrDownloading}
           debouncedQuery={debouncedQuery}
           randomizeBgPosition={randomizeBgPosition}
+          isMobile={isMobile}
         />
         <TrackList
               books={books}
@@ -233,10 +254,20 @@ export default function Home() {
       <Suspense fallback={null}>
         <URLReceiver setBooks={setBooks} setUserName={setUserName} />
       </Suspense>
-      <div className="w-1/3">
-        {receiptStyle === 'Bookie' && <BookieStyleReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition} />}
-        {receiptStyle === 'Receipt' && <ClassicReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition}/>}
-        {receiptStyle === 'Spotify' && <SpotifyStyleReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition}/>}
+      <div className="w-1/3 relative">
+        <div className={generatedImage ? 'absolute top-0 left-0 w-full -z-10 pointer-events-none' : ''}>
+          {receiptStyle === 'Bookie' && <BookieStyleReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition} />}
+          {receiptStyle === 'Receipt' && <ClassicReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition}/>}
+          {receiptStyle === 'Spotify' && <SpotifyStyleReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition}/>}
+        </div>
+
+        {generatedImage && (
+          <img 
+            src={generatedImage} 
+            alt="Receipt Preview" 
+            className="w-full h-auto shadow-lg"
+          />
+        )}
       </div>
       <p className="absolute bottom-4 left-4 text-sm text-gray-600">
         Made by{' '}

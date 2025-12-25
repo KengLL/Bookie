@@ -18,6 +18,7 @@ interface ControlsProps {
   generatingOrDownloading: boolean;
   debouncedQuery: string;
   randomizeBgPosition: () => void; 
+  isMobile?: boolean;
 }
 
 export default function Controls({
@@ -34,7 +35,8 @@ export default function Controls({
   downloadReceipt,
   generatingOrDownloading,
   debouncedQuery,
-  randomizeBgPosition
+  randomizeBgPosition,
+  isMobile = false
 }: ControlsProps) {
   return (
     <>
@@ -139,7 +141,7 @@ export default function Controls({
             generatingOrDownloading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-red-700'
           }`}
         >
-          {generatingOrDownloading ? 'Generating...' : 'Download Receipt'}
+          {generatingOrDownloading ? 'Generating...' : (isMobile ? 'Preview Receipt' : 'Download Receipt')}
         </button>
       </div>
     </>
