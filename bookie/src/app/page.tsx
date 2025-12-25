@@ -184,9 +184,14 @@ export default function Home() {
           </button>
         </div>
 
+        {activeTab === 'preview' && (
+          <p className="text-gray-500 text-xs mt-2 mb-2 animate-pulse text-center">
+            Long press the receipt to save image
+          </p>
+        )}
         <div className={`${activeTab !== 'preview' ? 'absolute left-0 top-0 opacity-0 pointer-events-none' : 'flex justify-center'}`}>
           <div className="w-full max-w-xs relative">
-            <div className={generatedImage ? 'absolute top-0 left-0 w-full -z-10 pointer-events-none' : ''}>
+            <div className={generatedImage ? 'absolute top-0 left-0 w-full -z-10 pointer-events-none opacity-0' : ''}>
               {receiptStyle === 'Bookie' && <BookieStyleReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition} />}
               {receiptStyle === 'Receipt' && <ClassicReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition}/>}
               {receiptStyle === 'Spotify' && <SpotifyStyleReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition}/>}

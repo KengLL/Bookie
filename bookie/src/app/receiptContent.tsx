@@ -65,7 +65,7 @@ export const ReceiptContent = ({ books, userName, receiptData, totalReadingTime 
       <div className="flex justify-center">
         {/* Barcode placeholder */}
       </div>
-      <p className="text-xs">bookie.com</p>
+      <p className="text-xs">localbookie.vercel.app</p>
     </div>
   </>
 );
