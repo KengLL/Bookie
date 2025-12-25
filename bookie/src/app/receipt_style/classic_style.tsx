@@ -110,7 +110,7 @@ const ClassicReceipt = forwardRef<HTMLDivElement, ReceiptProps>(({ books, userNa
             alt="Barcode"
             className="w-[70%] h-auto max-w-[210px] mx-auto block"
           />
-          <p className="font-receipt text-[2em] lowercase leading-5">bookie.com</p>
+          <p className="font-receipt text-[2em] lowercase leading-5">localbookie.vercel.app</p>
         </div>
       </div>
     </div>
