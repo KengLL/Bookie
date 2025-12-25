@@ -160,6 +160,9 @@ export default function Home() {
   if (isMobile) {
     return (
       <div className="min-h-screen bg-gray-100 p-4 flex flex-col text-black">
+        <Suspense fallback={null}>
+          <URLReceiver setBooks={setBooks} setUserName={setUserName} />
+        </Suspense>
         {/* Tab Navigation */}
         <div className="flex mb-4 bg-white rounded shadow overflow-hidden">
           <button 
