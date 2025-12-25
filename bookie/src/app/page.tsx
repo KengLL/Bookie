@@ -254,20 +254,22 @@ export default function Home() {
       <Suspense fallback={null}>
         <URLReceiver setBooks={setBooks} setUserName={setUserName} />
       </Suspense>
-      <div className="w-1/3 relative">
-        <div className={generatedImage ? 'absolute top-0 left-0 w-full -z-10 pointer-events-none' : ''}>
-          {receiptStyle === 'Bookie' && <BookieStyleReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition} />}
-          {receiptStyle === 'Receipt' && <ClassicReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition}/>}
-          {receiptStyle === 'Spotify' && <SpotifyStyleReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition}/>}
-        </div>
+      <div className="w-1/3 flex justify-center">
+        <div className="w-full max-w-sm relative">
+          <div className={generatedImage ? 'absolute top-0 left-0 w-full -z-10 pointer-events-none' : ''}>
+            {receiptStyle === 'Bookie' && <BookieStyleReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition} />}
+            {receiptStyle === 'Receipt' && <ClassicReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition}/>}
+            {receiptStyle === 'Spotify' && <SpotifyStyleReceipt ref={receiptRef} books={books} userName={userName} bgPosition={bgPosition}/>}
+          </div>
 
-        {generatedImage && (
-          <img 
-            src={generatedImage} 
-            alt="Receipt Preview" 
-            className="w-full h-auto shadow-lg"
-          />
-        )}
+          {generatedImage && (
+            <img 
+              src={generatedImage} 
+              alt="Receipt Preview" 
+              className="w-full h-auto shadow-lg"
+            />
+          )}
+        </div>
       </div>
       <p className="absolute bottom-4 left-4 text-sm text-gray-600">
         Made by{' '}
